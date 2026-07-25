@@ -29,4 +29,11 @@ export const findUserByRole = async(role) => {
     return await User.find({role}).select('-password')
 }
 
-// for the password change it works without findUserIdWithPassword  
+export const findUsersByCompanyId = async (companyId) => {
+    return await User.find({ companyId });
+};
+
+export const updateUserCompany = async (userId, companyId) => {
+    return await User.findByIdAndUpdate(userId,{ companyId },{ new: true }
+    );
+};

@@ -7,7 +7,7 @@ export const getMe = async(req, res) => {
         res.status(200).json({
             success:true,
             message:'profile fetched Successfully',
-            name:user.name, email:user.email, role:user.role
+            name: user.name, email: user.email, role: user.role
         })
     } catch (error) {
         res.status(400).json({
@@ -23,7 +23,12 @@ export const updateProfile = async(req, res) => {
         res.status(200).json({
             success:true,
             message:'profile updated Successfully',
-            ...updatedUser
+            data: {
+                id: updatedUser._id,
+                name: updatedUser.name,
+                email: updatedUser.email,
+                role: updatedUser.role
+            }
         })
     } catch (error) {
         res.status(400).json({
@@ -39,8 +44,7 @@ export const changePassword = async(req, res) => {
         const updatedUser = await changeUserPassword(req.id, oldPassword, newPassword)
         res.status(200).json({
             success:true,
-            message:'password changed Successfully',
-            ...updatedUser
+            message:'password changed Successfully'
         })
     } catch (error) {
         res.status(400).json({
