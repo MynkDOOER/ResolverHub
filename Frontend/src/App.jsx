@@ -5,6 +5,8 @@ import Login from "./pages/Login";
 import Home from "./pages/Home";
 import Profile from "./pages/profile";
 import CreateCompany from "./pages/createCompany";
+import ProtectedRoute from "./components/ProtectedRoute";
+import PublicRoute from "./components/PublicRoute";
 
 const App = () => {
 	return (
@@ -12,10 +14,38 @@ const App = () => {
 			<Routes>
 				<Route path="/" element={<Layout />}>
 					<Route index element={<Home />} />
-					<Route path="/signup" element={<Signup />} />
-					<Route path="/login" element={<Login />} />
-					<Route path="/profile" element={<Profile />} />
-					<Route path="/company/create" element={<CreateCompany />} />
+					<Route
+						path="/signup"
+						element={
+							<PublicRoute>
+								<Signup />
+							</PublicRoute>
+						}
+					/>
+					<Route
+						path="/login"
+						element={
+							<PublicRoute>
+								<Login />
+							</PublicRoute>
+						}
+					/>
+					<Route
+						path="/profile"
+						element={
+							<ProtectedRoute>
+								<Profile />
+							</ProtectedRoute>
+						}
+					/>
+					<Route
+						path="/company/create"
+						element={
+							<ProtectedRoute>
+								<CreateCompany />
+							</ProtectedRoute>
+						}
+					/>
 				</Route>
 			</Routes>
 		</>
