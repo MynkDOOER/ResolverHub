@@ -155,7 +155,7 @@ export const deleteCompany = async (companyId, userId) => {
 		await session.withTransaction(async () => {
 			await updateManyUsers(
 				{ companyId: companyId },
-				{
+				   {
 					companyId: null,
 					projectId: null,
 					role: "Unassigned",

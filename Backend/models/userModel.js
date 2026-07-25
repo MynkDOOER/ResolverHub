@@ -24,6 +24,7 @@ const userSchema = new mongoose.Schema(
 
 		projectId: {
 			type: mongoose.Schema.Types.ObjectId,
+			ref:'project',
 			default: null,
 		},
 
