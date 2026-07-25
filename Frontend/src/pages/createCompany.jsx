@@ -8,6 +8,7 @@ const CreateCompany = () => {
 	const [error, setError] = useState("");
 	const navigate = useNavigate();
 	const token = useAuthStore((state) => state.token);
+	const refreshUser = useAuthStore((state) => state.refreshUser);
 
 	const handleChange = (e) => {
 		setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -33,6 +34,7 @@ const CreateCompany = () => {
 				throw new Error(data.message || "Failed to create company");
 			}
 
+			refreshUser(data.data.updatedUser);
 			navigate("/");
 		} catch (error) {
 			setError(error.message);

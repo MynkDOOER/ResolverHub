@@ -3,8 +3,8 @@ import Layout from "./layout/Layout";
 import Signup from "./pages/Signup";
 import Login from "./pages/Login";
 import Home from "./pages/Home";
-import Profile from "./pages/profile";
-import CreateCompany from "./pages/createCompany";
+import Profile from "./pages/Profile";
+import CreateCompany from "./pages/CreateCompany";
 import ProtectedRoute from "./components/ProtectedRoute";
 import PublicRoute from "./components/PublicRoute";
 

@@ -11,7 +11,8 @@ const useAuthStore = create(
 
 			logout: () => set({ token: null, user: null }),
 
-			refreshUser: (user) => set({ user }),
+			refreshUser: (userData) =>
+				set((state) => ({ user: { ...state.user, ...userData } })),
 		}),
 		{
 			name: "auth-storage",
