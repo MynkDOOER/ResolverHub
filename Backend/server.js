@@ -1,11 +1,19 @@
-import express from "express";
 import cors from "cors";
-import "dotenv/config";
-import mongoose from "mongoose";
 import dns from "dns";
+dns.setServers(["8.8.8.8", "8.8.4.4"]);
+import dotenv from "dotenv";
+import express from "express";
+import mongoose from "mongoose";
+
+import authRoutes from "./routes/authRoutes.js";
 import companyRoutes from "./routes/companyRoutes.js";
 
-dns.setServers(["8.8.8.8", "8.8.4.4"]);
+dotenv.config({
+	path: "../.env",
+	override: true,
+});
+
+dns.setServers(["8.8.8.8", "8.8.4.4"]); // Remove this later. Only for development because it doesn't work
 
 const app = express();
 
@@ -24,6 +32,7 @@ const connectDB = async () => {
 
 connectDB();
 
+app.use("/api/v1/auth", authRoutes);
 app.use("/api/company", companyRoutes);
 
 const PORT = process.env.PORT;

@@ -6,31 +6,15 @@ import {
 
 export const create = async (req, res) => {
 	try {
-		const company = await registerCompany(req.body);
+		const data = await registerCompany(req.body, req.id);
 		res.status(201).json({
 			success: true,
 			message: "Company Created Successfully",
-			company,
+			data,
 		});
 	} catch (error) {
 		res.status(400).json({
-			success: true,
-			message: error.message,
-		});
-	}
-};
-
-export const remove = async (req, res) => {
-	try {
-		const deletedCompany = await deleteCompany(req.body, req.id);
-		res.status(200).json({
-			success: true,
-			message: "Company Deleted Succesfully",
-			...deletedCompany,
-		});
-	} catch (error) {
-		res.status(400).json({
-			success: true,
+			success: false,
 			message: error.message,
 		});
 	}
@@ -38,15 +22,33 @@ export const remove = async (req, res) => {
 
 export const update = async (req, res) => {
 	try {
-		const updatedCompany = await updateCompany(req.body, req.id);
+		const { companyId } = req.params;
+		const updatedCompany = await updateCompany(companyId, req.body, req.id);
 		res.status(200).json({
 			success: true,
 			message: "Company Updated Succesfully",
-			...updatedCompany,
+			data: updatedCompany,
 		});
 	} catch (error) {
 		res.status(400).json({
+			success: false,
+			message: error.message,
+		});
+	}
+};
+
+export const remove = async (req, res) => {
+	try {
+		const { companyId } = req.params;
+		const deletedCompany = await deleteCompany(companyId, req.id);
+		res.status(200).json({
 			success: true,
+			message: "Company Deleted Succesfully",
+			data: deletedCompany,
+		});
+	} catch (error) {
+		res.status(400).json({
+			success: false,
 			message: error.message,
 		});
 	}

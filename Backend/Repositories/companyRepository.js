@@ -1,12 +1,22 @@
 import Company from "../models/companyModel.js";
 
-export const createCompany = async (companyData, inviteCode) => {
-	return await Company.create({
-		name: companyData.name,
-		email: companyData.email,
-		inviteCode,
-		adminId: companyData.id,
-	});
+export const createCompany = async (
+	companyData,
+	inviteCode,
+	adminId,
+	options = {},
+) => {
+	const [company] = await Company.create(
+		[
+			{
+				...companyData,
+				inviteCode,
+				adminId,
+			},
+		],
+		options,
+	);
+	return company;
 };
 
 export const findCompanyByEmail = async (email) => {
@@ -21,10 +31,17 @@ export const findCompanyByInviteCode = async (inviteCode) => {
 	return await Company.findOne({ inviteCode: inviteCode });
 };
 
-export const findCompanyByIdAndUpdate = async (companyId, updates) => {
-	return await Company.findByIdAndUpdate(companyId, updates, { new: true });
+export const findCompanyByIdAndUpdate = async (
+	companyId,
+	updates,
+	options = {},
+) => {
+	return await Company.findByIdAndUpdate(companyId, updates, {
+		new: true,
+		...options,
+	});
 };
 
-export const findCompanyByIdAndDelete = async (companyId) => {
-	return await Company.findByIdAndDelete(companyId);
+export const findCompanyByIdAndDelete = async (companyId, options = {}) => {
+	return await Company.findByIdAndDelete(companyId, options);
 };

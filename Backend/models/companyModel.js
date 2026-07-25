@@ -22,6 +22,7 @@ const companySchema = new mongoose.Schema(
 		adminId: {
 			type: mongoose.Schema.Types.ObjectId,
 			required: true,
+			ref: "User",
 		},
 	},
 	{ timestamps: true },

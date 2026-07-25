@@ -1,10 +1,11 @@
 import express from "express";
 import { create, remove, update } from "../controllers/companyController.js";
+import protect from "../middlewares/authMiddleware.js";
 
 const router = express.Router();
 
-router.post("/create", protect, create);
-router.delete("/delete", protect, remove);
-router.put("/update", protect, update);
+router.post("/", protect, create);
+router.delete("/:companyId", protect, remove);
+router.put("/:companyId", protect, update);
 
 export default router;
