@@ -7,7 +7,20 @@ const Navbar = () => {
       style={{ fontFamily: "'Fira Code', monospace" }}
     >
       
-      <div className="navbar-start">
+      <div className="navbar-start flex items-center gap-3">
+        <Link 
+          to="/profile" 
+          className="btn btn-ghost btn-circle avatar h-10 w-10 min-h-0"
+          aria-label="View Profile"
+        >
+          <div className="w-9 h-9 rounded-full ring-2 ring-purple-100 transition-all hover:ring-purple-400">
+            <img 
+              src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp" 
+              alt="Profile Avatar" 
+            />
+          </div>
+        </Link>
+
         <Link to="/" className="text-xl font-bold tracking-tight text-purple-600 transition-colors hover:text-purple-700">
           Bug Vault
         </Link>
@@ -22,7 +35,6 @@ const Navbar = () => {
             <Link to="/signup" className="transition-colors hover:text-purple-600">Signup</Link>
           </li>
           <li>
-
             <Link 
               to="/login" 
               className="rounded-lg bg-purple-50 px-5 py-2 text-purple-700 transition-colors hover:bg-purple-100"

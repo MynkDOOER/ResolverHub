@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { update } from "../controllers/companyController.js";
+
 import {
 	createCompany,
 	findCompanyByEmail,
