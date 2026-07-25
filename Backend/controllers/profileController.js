@@ -1,4 +1,4 @@
-import { changeUserPassword, getUserProfile, updateUserProfile } from "../service/profileService.js"
+import { changeUserPassword, getUserProfile, updateUserProfile } from "../services/profileService.js"
 
 
 export const getMe = async(req, res) => {
