@@ -145,12 +145,12 @@ export const updateBug = async (bugId, bugData, userId) => {
       throw new Error("Developer can only update status");
     }
 
-    if(!["In Progress", "Resolved"].includes(bugData.status)) {
+    if(!["InProgress", "Resolved"].includes(bugData.status)) {
       throw new Error("Developer can only set status to In Progress and Resolved");
     }
 
     allowedUpdates.status = bugData.status;
-  } else if (user.role === "Admin") {
+  } else if (user.role === "ProjectAdmin") {
     Object.assign(allowedUpdates, bugData);
   } else {
     throw new Error("Unauthorized");
@@ -173,7 +173,7 @@ export const deleteBug = async (bugId, userId) => {
   }
 
   if (user.role !== "ProjectAdmin") {
-    throw new Error("Only Admin can delete bugs");
+    throw new Error("Only Project Admin can delete bugs");
   }
 
   if (bug.companyId.toString() !== user.companyId.toString()) {
