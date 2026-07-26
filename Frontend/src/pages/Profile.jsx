@@ -1,6 +1,6 @@
 // import { useState } from "react"
 
-const profile = () => {
+const Profile = () => {
 
   // const[user, setUser] = useState({
   //   username:'',
@@ -17,4 +17,4 @@ const profile = () => {
   )
 }
 
-export default profile
+export default Profile
