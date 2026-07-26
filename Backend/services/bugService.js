@@ -131,7 +131,7 @@ export const updateBug = async (bugId, bugData, userId) => {
       bugData.status &&
       !["Open", "Closed"].includes(bugData.status)
     ) {
-      throw new Error("Tester can only set status to Open, Resolved or Closed");
+      throw new Error("Tester can only set status to Open, Closed");
     }
 
     if (bugData.title) allowedUpdates.title = bugData.title;
