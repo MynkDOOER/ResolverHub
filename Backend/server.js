@@ -7,9 +7,9 @@ import mongoose from "mongoose";
 import authRoutes from "./routes/authRoutes.js";
 import profileRoutes from "./routes/profileRoutes.js";
 import companyRoutes from "./routes/companyRoutes.js";
-import projectRoutes from "./routes/projectroutes.js";
+import projectRoutes from "./routes/projectRoutes.js";
 import notificationRoutes from "./routes/notificationRoutes.js";
-import bugRoutes from './routes/bugRoutes.js'
+import bugRoutes from "./routes/bugRoutes.js";
 
 dns.setServers(["8.8.8.8", "8.8.4.4"]);
 
