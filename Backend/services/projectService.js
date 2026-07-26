@@ -109,6 +109,24 @@ export const deleteProject = async (projectId, userId) => {
   };
 };
 
+export const getProject = async(projectId, userId) => {
+  const project = await findProjectById(projectId);
+  if(!project){
+    throw new Error("Project Not found");
+  }
+  const user = await findUserById(userId);
+   if (!user) {
+    throw new Error("User not found");
+  }
+  if (!user.companyId) {
+    throw new Error("User doesn't belong to a company");
+  }
+  if(project.companyId.toString() !== user.companyId.toString()){
+    throw new Error("Unauthorized");
+  }
+  return project;
+}
+
 export const getAllProjects = async (userId) => {
   const user = await findUserById(userId);
 
@@ -119,6 +137,6 @@ export const getAllProjects = async (userId) => {
   if (!user.companyId) {
     throw new Error("User doesn't belong to a company");
   }
-
+  
   return await findProjectByCompanyId(user.companyId);
 };
