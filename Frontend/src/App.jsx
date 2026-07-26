@@ -7,19 +7,19 @@ import Profile from "./pages/profile";
 import CreateCompany from "./pages/createCompany";
 
 const App = () => {
-	return (
-		<>
-			<Routes>
-				<Route path="/" element={<Layout />}>
-					<Route index element={<Home />} />
-					<Route path="/signup" element={<Signup />} />
-					<Route path="/login" element={<Login />} />
-					<Route path="/profile" element={<Profile />} />
-					<Route path="/company/create" element={<CreateCompany />} />
-				</Route>
-			</Routes>
-		</>
-	);
+  return (
+    <>
+      <Routes>
+        <Route path="/" element={<Layout />}>
+          <Route index element={<Home />} />
+          <Route path="/signup" element={<Signup />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/company/create" element={<CreateCompany />} />
+        </Route>
+      </Routes>
+    </>
+  );
 };
 
 export default App;
