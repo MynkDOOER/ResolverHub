@@ -6,8 +6,8 @@ import Login from "./pages/Login";
 import Home from "./pages/Home";
 import Profile from "./pages/Profile";
 import CreateCompany from "./pages/CreateCompany";
-import ProtectedRoute from "./components/ProtectedRoute";
-import PublicRoute from "./components/PublicRoute";
+import AuthProtectedRoute from "./components/authProtection/ProtectedRoute";
+import AuthPublicRoute from "./components/authProtection/PublicRoute";
 
 const App = () => {
 	return (
@@ -18,33 +18,33 @@ const App = () => {
 					<Route
 						path="/signup"
 						element={
-							<PublicRoute>
+							<AuthPublicRoute>
 								<Signup />
-							</PublicRoute>
+							</AuthPublicRoute>
 						}
 					/>
 					<Route
 						path="/login"
 						element={
-							<PublicRoute>
+							<AuthPublicRoute>
 								<Login />
-							</PublicRoute>
+							</AuthPublicRoute>
 						}
 					/>
 					<Route
 						path="/profile"
 						element={
-							<ProtectedRoute>
+							<AuthProtectedRoute>
 								<Profile />
-							</ProtectedRoute>
+							</AuthProtectedRoute>
 						}
 					/>
 					<Route
 						path="/company/create"
 						element={
-							<ProtectedRoute>
+							<AuthProtectedRoute>
 								<CreateCompany />
-							</ProtectedRoute>
+							</AuthProtectedRoute>
 						}
 					/>
 				</Route>
