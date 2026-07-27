@@ -7,6 +7,7 @@ import Home from "./pages/Home";
 import Profile from "./pages/Profile";
 import AuthProtectedRoute from "./components/authProtection/ProtectedRoute";
 import AuthPublicRoute from "./components/authProtection/PublicRoute";
+import ProjectsView from "./pages/ProjectsView";
 import CompanyProtectedRoute from "./components/companyProtection/ProtectedRoute";
 import CompanyPublicRoute from "./components/companyProtection/PublicRoute";
 import CompanySetup from "./pages/CompanySetup";
@@ -51,6 +52,16 @@ const App = () => {
 							</AuthProtectedRoute>
 						}
 					/>
+					<Route
+						path="/company/projects"
+						element={
+							<AuthProtectedRoute>
+								<CompanyProtectedRoute>
+									<ProjectsView />
+								</CompanyProtectedRoute>
+							</AuthProtectedRoute>
+						}
+					/>
 				</Route>
 			</Routes>
 
@@ -62,15 +73,15 @@ const App = () => {
 					duration: 3000,
 					style: {
 						background: "#ffffff",
-						color: "#0f172a", // Slightly darker slate for better contrast
+						color: "#0f172a",
 						border: "1px solid #e9d5ff",
-						borderRadius: "1rem", // Softer, rounder corners
-						padding: "14px 18px", // More breathing room inside the toast
+						borderRadius: "1rem",
+						padding: "14px 18px",
 						fontFamily:
 							"var(--font-fira-code, 'Fira Code', monospace)",
-						fontWeight: "500", // Slightly bolder text for readability
+						fontWeight: "500",
 						fontSize: "0.875rem",
-						// Layered shadows for a premium, elevated look
+
 						boxShadow:
 							"0 10px 20px -5px rgba(108, 93, 231, 0.15), 0 4px 6px -2px rgba(108, 93, 231, 0.05)",
 					},
@@ -80,7 +91,7 @@ const App = () => {
 							secondary: "#ffffff",
 						},
 						style: {
-							borderLeft: "5px solid #7ca668", // Purple accent strip on the left
+							borderLeft: "5px solid #7ca668",
 						},
 					},
 					error: {
@@ -89,7 +100,7 @@ const App = () => {
 							secondary: "#ffffff",
 						},
 						style: {
-							borderLeft: "5px solid #ef4444", // Red accent strip on the left
+							borderLeft: "5px solid #ef4444",
 						},
 					},
 				}}
