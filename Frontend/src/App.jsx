@@ -56,6 +56,9 @@ const App = () => {
               </AuthProtectedRoute>
             }
           />
+
+          {/* Here company/setup    <------- Goes here   */  }
+      
         </Route>
       </Routes>
 
@@ -69,12 +72,12 @@ const App = () => {
             background: "#ffffff",
             color: "#0f172a",
             border: "1px solid #e9d5ff",
-            borderRadius: "1rem", 
-            padding: "14px 18px", 
+            borderRadius: "1rem",
+            padding: "14px 18px",
             fontFamily: "var(--font-fira-code, 'Fira Code', monospace)",
-            fontWeight: "500", 
+            fontWeight: "500",
             fontSize: "0.875rem",
-            
+
             boxShadow:
               "0 10px 20px -5px rgba(108, 93, 231, 0.15), 0 4px 6px -2px rgba(108, 93, 231, 0.05)",
           },
@@ -84,7 +87,7 @@ const App = () => {
               secondary: "#ffffff",
             },
             style: {
-              borderLeft: "5px solid #7ca668", 
+              borderLeft: "5px solid #7ca668",
             },
           },
           error: {
@@ -93,7 +96,7 @@ const App = () => {
               secondary: "#ffffff",
             },
             style: {
-              borderLeft: "5px solid #ef4444", 
+              borderLeft: "5px solid #ef4444",
             },
           },
         }}
