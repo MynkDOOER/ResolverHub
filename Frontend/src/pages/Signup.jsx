@@ -46,7 +46,6 @@ const Signup = () => {
 				style={{ fontFamily: "'Fira Code', monospace" }}
 			>
 				<form onSubmit={handleSubmit} className="w-full max-w-md">
-					{/* Card Container with Theme-Matched Border */}
 					<div className="rounded-2xl border border-purple-200 bg-white p-8 shadow-xl shadow-purple-900/5">
 						<div className="mb-8 text-center">
 							<h2 className="text-2xl font-bold tracking-tight text-slate-900">
