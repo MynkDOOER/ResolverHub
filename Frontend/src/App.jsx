@@ -5,9 +5,11 @@ import Signup from "./pages/Signup";
 import Login from "./pages/Login";
 import Home from "./pages/Home";
 import Profile from "./pages/Profile";
-import CreateCompany from "./pages/CreateCompany";
 import AuthProtectedRoute from "./components/authProtection/ProtectedRoute";
 import AuthPublicRoute from "./components/authProtection/PublicRoute";
+import CompanyProtectedRoute from "./components/companyProtection/ProtectedRoute";
+import CompanyPublicRoute from "./components/companyProtection/PublicRoute";
+import CompanySetup from "./pages/CompanySetup";
 
 const App = () => {
 	return (
@@ -40,10 +42,12 @@ const App = () => {
 						}
 					/>
 					<Route
-						path="/company/create"
+						path="/company/setup"
 						element={
 							<AuthProtectedRoute>
-								<CreateCompany />
+								<CompanyPublicRoute>
+									<CompanySetup />
+								</CompanyPublicRoute>
 							</AuthProtectedRoute>
 						}
 					/>
