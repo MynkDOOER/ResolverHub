@@ -1,13 +1,11 @@
 import { Link, useNavigate } from "react-router-dom";
-import useAuthStore from "../stores/authStore"; // Adjust path if your store is located elsewhere
+import useAuthStore from "../stores/authStore"; 
 
 const Navbar = () => {
-	// 1. Extract only the state pieces we need for optimal re-rendering
 	const user = useAuthStore((state) => state.user);
 	const logout = useAuthStore((state) => state.logout);
 	const navigate = useNavigate();
 
-	// 2. Handle logout and redirect the user
 	const handleLogout = () => {
 		logout();
 		navigate("/login");
@@ -19,7 +17,6 @@ const Navbar = () => {
 			style={{ fontFamily: "'Fira Code', monospace" }}
 		>
 			<div className="navbar-start flex items-center gap-3">
-				{/* Only show the Profile Avatar if the user is logged in */}
 				{user && (
 					<Link
 						to="/profile"
@@ -47,7 +44,6 @@ const Navbar = () => {
 			<div className="navbar-end hidden lg:flex">
 				<ul className="flex items-center gap-6 px-1 text-sm font-semibold text-slate-600">
 					{user ? (
-						// --- LOGGED IN VIEW (Desktop) ---
 						<>
 							<li>
 								<Link
@@ -57,6 +53,14 @@ const Navbar = () => {
 									Dashboard
 								</Link>
 							</li>
+                            <li>
+                                <Link
+                                    to="/company/projects"
+                                    className="transition-colors hover:text-purple-600"
+                                >
+                                    Projects
+                                </Link>
+                            </li>
 							<li>
 								<button
 									onClick={handleLogout}
@@ -67,7 +71,6 @@ const Navbar = () => {
 							</li>
 						</>
 					) : (
-						// --- LOGGED OUT VIEW (Desktop) ---
 						<>
 							<li>
 								<Link
@@ -90,7 +93,6 @@ const Navbar = () => {
 				</ul>
 			</div>
 
-			{/* Mobile Hamburger Menu */}
 			<div className="navbar-end flex lg:hidden">
 				<div className="dropdown dropdown-end">
 					<label
@@ -117,7 +119,6 @@ const Navbar = () => {
 						className="menu dropdown-content menu-sm z-1 mt-3 w-52 rounded-xl border border-purple-100 bg-white p-2 font-medium text-slate-600 shadow-xl shadow-purple-900/5"
 					>
 						{user ? (
-							// --- LOGGED IN VIEW (Mobile) ---
 							<>
 								<li>
 									<Link
@@ -145,7 +146,6 @@ const Navbar = () => {
 								</li>
 							</>
 						) : (
-							// --- LOGGED OUT VIEW (Mobile) ---
 							<>
 								<li>
 									<Link

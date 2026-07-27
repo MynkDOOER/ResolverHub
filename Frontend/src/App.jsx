@@ -8,90 +8,98 @@ import Profile from "./pages/Profile";
 import CreateCompany from "./pages/CreateCompany";
 import AuthProtectedRoute from "./components/authProtection/ProtectedRoute";
 import AuthPublicRoute from "./components/authProtection/PublicRoute";
+import ProjectsView from "./pages/ProjectsView";
 
 const App = () => {
-	return (
-		<>
-			<Routes>
-				<Route path="/" element={<Layout />}>
-					<Route index element={<Home />} />
-					<Route
-						path="/signup"
-						element={
-							<AuthPublicRoute>
-								<Signup />
-							</AuthPublicRoute>
-						}
-					/>
-					<Route
-						path="/login"
-						element={
-							<AuthPublicRoute>
-								<Login />
-							</AuthPublicRoute>
-						}
-					/>
-					<Route
-						path="/profile"
-						element={
-							<AuthProtectedRoute>
-								<Profile />
-							</AuthProtectedRoute>
-						}
-					/>
-					<Route
-						path="/company/create"
-						element={
-							<AuthProtectedRoute>
-								<CreateCompany />
-							</AuthProtectedRoute>
-						}
-					/>
-				</Route>
-			</Routes>
+  return (
+    <>
+      <Routes>
+        <Route path="/" element={<Layout />}>
+          <Route index element={<Home />} />
+          <Route
+            path="/signup"
+            element={
+              <AuthPublicRoute>
+                <Signup />
+              </AuthPublicRoute>
+            }
+          />
+          <Route
+            path="/login"
+            element={
+              <AuthPublicRoute>
+                <Login />
+              </AuthPublicRoute>
+            }
+          />
+          <Route
+            path="/profile"
+            element={
+              <AuthProtectedRoute>
+                <Profile />
+              </AuthProtectedRoute>
+            }
+          />
+          <Route
+            path="/company/create"
+            element={
+              <AuthProtectedRoute>
+                <CreateCompany />
+              </AuthProtectedRoute>
+            }
+          />
+          <Route
+            path="/company/projects"
+            element={
+              <AuthProtectedRoute>
+                <ProjectsView />
+              </AuthProtectedRoute>
+            }
+          />
+        </Route>
+      </Routes>
 
-			{/* Global Toast Notifications */}
-			<Toaster
-				position="bottom-right"
-				reverseOrder={false}
-				toastOptions={{
-					duration: 3000,
-					style: {
-						background: "#ffffff",
-						color: "#0f172a", // Slightly darker slate for better contrast
-						border: "1px solid #e9d5ff",
-						borderRadius: "1rem", // Softer, rounder corners
-						padding: "14px 18px", // More breathing room inside the toast
-						fontFamily:
-							"var(--font-fira-code, 'Fira Code', monospace)",
-						fontWeight: "500", // Slightly bolder text for readability
-						fontSize: "0.875rem",
-						// Layered shadows for a premium, elevated look
-						boxShadow:
-							"0 10px 20px -5px rgba(108, 93, 231, 0.15), 0 4px 6px -2px rgba(108, 93, 231, 0.05)",
-					},
-					success: {
-						iconTheme: {
-							primary: "#7ca668",
-							secondary: "#ffffff",
-						},
-						style: {
-							borderLeft: "5px solid #7ca668", // Purple accent strip on the left
-						},
-					},
-					error: {
-						iconTheme: {
-							primary: "#ef4444",
-							secondary: "#ffffff",
-						},
-						style: {
-							borderLeft: "5px solid #ef4444", // Red accent strip on the left
-						},
-					},
-				}}
-			/>
-		</>
-	);
+      {/* Global Toast Notifications */}
+      <Toaster
+        position="bottom-right"
+        reverseOrder={false}
+        toastOptions={{
+          duration: 3000,
+          style: {
+            background: "#ffffff",
+            color: "#0f172a",
+            border: "1px solid #e9d5ff",
+            borderRadius: "1rem", 
+            padding: "14px 18px", 
+            fontFamily: "var(--font-fira-code, 'Fira Code', monospace)",
+            fontWeight: "500", 
+            fontSize: "0.875rem",
+            
+            boxShadow:
+              "0 10px 20px -5px rgba(108, 93, 231, 0.15), 0 4px 6px -2px rgba(108, 93, 231, 0.05)",
+          },
+          success: {
+            iconTheme: {
+              primary: "#7ca668",
+              secondary: "#ffffff",
+            },
+            style: {
+              borderLeft: "5px solid #7ca668", 
+            },
+          },
+          error: {
+            iconTheme: {
+              primary: "#ef4444",
+              secondary: "#ffffff",
+            },
+            style: {
+              borderLeft: "5px solid #ef4444", 
+            },
+          },
+        }}
+      />
+    </>
+  );
 };
 
 export default App;
