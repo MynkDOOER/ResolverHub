@@ -6,6 +6,7 @@ import {
 	findPendingProjectJoinRequest,
 	findPendingCompanyJoinRequest,
 	updateNotificationById,
+	findCompanyRequestsForAdmin,
 } from "../repositories/notificationRepository.js";
 import { findCompanyByInviteCode } from "../repositories/companyRepository.js";
 import {
@@ -118,7 +119,7 @@ export const markAsRead = async (notificationId, userId) => {
 };
 
 export const acceptJoinRequest = async (notificationId, userId) => {
-	const user = findUserById(userId);
+	const user = await findUserById(userId);
 	if (!user) {
 		throw new Error("User Not Found");
 	}
@@ -208,4 +209,18 @@ export const denyJoinRequest = async (notificationId, userId) => {
 		actionStatus: "Declined",
 		isRead: true,
 	});
+};
+
+export const fetchCompanyRequests = async (userId) => {
+    const user = await findUserById(userId);
+
+    if (!user) {
+        throw new Error("User Not Found");
+    }
+
+    if (user.role !== "Admin") {
+        throw new Error("Only company admin can view requests");
+    }
+
+    return await findCompanyRequestsForAdmin(userId);
 };

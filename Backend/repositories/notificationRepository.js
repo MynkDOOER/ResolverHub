@@ -44,3 +44,11 @@ export const updateNotificationById = async (
 		...options,
 	});
 };
+
+export const findCompanyRequestsForAdmin = async (adminId) => {
+    return Notification.find({
+        recipientId: adminId,
+        type: "Company_Join_Request",
+        actionStatus: "Pending",
+    }).populate("senderId", "name email");
+};

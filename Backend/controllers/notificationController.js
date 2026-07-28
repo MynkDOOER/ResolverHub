@@ -1,6 +1,7 @@
 import {
 	acceptJoinRequest,
 	denyJoinRequest,
+	fetchCompanyRequests,
 	fetchUserNotifications,
 	markAsRead,
 	requestCompanyJoin,
@@ -107,4 +108,20 @@ export const denyRequest = async (req, res) => {
 			message: error.message,
 		});
 	}
+};
+
+export const getCompanyRequests = async (req, res) => {
+    try {
+        const requests = await fetchCompanyRequests(req.id);
+
+        res.status(200).json({
+            success: true,
+            data: requests,
+        });
+    } catch (error) {
+        res.status(400).json({
+            success: false,
+            message: error.message,
+        });
+    }
 };

@@ -1,7 +1,7 @@
 import project from "../models/projectModel.js"
 
-export const createProject = async(projectData) => {
-    return await project.create(projectData);
+export const createProject = async(projectData, options) => {
+    return await project.create([projectData], options);
 }
 
 export const findProjectById = async(projectId) => {
