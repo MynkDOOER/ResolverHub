@@ -1,23 +1,26 @@
 import toast from "react-hot-toast";
-import { fetchAllProjects, createNewProject, deleteProjectById } from "../api/projectApi";
+import {
+  fetchAllProjects,
+  createNewProject,
+  deleteProjectById,
+} from "../api/projectApi";
 import useAuthStore from "../stores/authStore";
 import { useEffect, useState } from "react";
+import { Plus, Folder, Trash2, Bug, X, Activity } from "lucide-react";
 
 const ProjectsView = () => {
-  const { user, token } = useAuthStore(); 
-  
-  const isCompanyAdmin = user?.role === "Admin" || user?.role === "Company Admin";
-  const hasCompany = Boolean(user?.companyId); 
+  const { user, token } = useAuthStore();
+  const isCompanyAdmin = user?.role === "Admin";
 
   const [projects, setProjects] = useState([]);
   const [companyUsers, setCompanyUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  
-  const [newProject, setNewProject] = useState({ 
-    name: "", 
-    description: "", 
-    projectAdminId: "" 
+
+  const [newProject, setNewProject] = useState({
+    name: "",
+    description: "",
+    projectAdminId: "",
   });
 
   // Fetch Projects & Unassigned Users
@@ -28,10 +31,13 @@ const ProjectsView = () => {
         setProjects(data);
 
         // Fetch company users for assignment if user is Admin
-        if (isCompanyAdmin && hasCompany) {
-          const res = await fetch("http://localhost:5000/api/company/members", {
-            headers: { Authorization: `Bearer ${token}` }
-          });
+        if (isCompanyAdmin) {
+          const res = await fetch(
+            "http://localhost:5000/api/company/free-members",
+            {
+              headers: { Authorization: `Bearer ${token}` },
+            },
+          );
           if (res.ok) {
             const members = await res.json();
             setCompanyUsers(members.data || members);
@@ -44,201 +50,275 @@ const ProjectsView = () => {
       }
     };
     loadData();
-  }, [isCompanyAdmin, hasCompany, token]);
+  }, [isCompanyAdmin, token]);
 
   // Filter unassigned users for Project Admin selection
-  const unassignedUsers = companyUsers.filter((u) => !u.currentProjectId && u._id !== user?._id);
+  const unassignedUsers = companyUsers.filter(
+    (u) => !u.projectId && u._id !== user?._id,
+  );
 
   const handleCreateSubmit = async (e) => {
-    e.preventDefault(); 
-    if (!newProject.name) return toast.error("Project name is required");
+    e.preventDefault();
+    const toastid = toast.loading("Creating project...");
 
-    const toastId = toast.loading("Creating project...");
     try {
+      if (!newProject.projectAdminId) {
+        toast.dismiss(toastid);
+        return toast.error("Please assign a Project Admin.");
+      }
       const result = await createNewProject(newProject);
-      setProjects([...projects, result.data || result]); 
-      toast.success("Project created successfully!", { id: toastId });
-      
+
+      setProjects([...projects, result.data.projectCreated]);
+      toast.dismiss(toastid);
+      toast.success("Project created successfully!");
+
+      setCompanyUsers((prev) =>
+        prev.filter(
+          (user) =>
+            user._id.toString() !== result.data.updatedUser._id.toString(),
+        ),
+      );
       setNewProject({ name: "", description: "", projectAdminId: "" });
       setIsModalOpen(false);
     } catch (error) {
-      toast.error(error.message || "Failed to create project", { id: toastId });
+      toast.dismiss(toastid);
+      toast.error(error.message || "Failed to create project");
     }
   };
 
   const handleDelete = async (id) => {
-    if (!window.confirm("Are you sure you want to delete this project?")) return;
-    
-    const toastId = toast.loading("Deleting project...");
+    if (!window.confirm("Are you sure you want to delete this project?"))
+      return;
+    const toastid = toast.loading("Deleting project...");
     try {
       await deleteProjectById(id);
+      setLoading(true);
+      const res = await fetch(
+        "http://localhost:5000/api/company/free-members",
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        },
+      );
+      if (res.ok) {
+        const members = await res.json();
+        setCompanyUsers(members.data || members);
+      }
+
       setProjects(projects.filter((p) => p._id !== id));
-      toast.success("Project deleted successfully", { id: toastId });
+      toast.dismiss(toastid);
+      toast.success("Project deleted successfully");
     } catch (error) {
-      toast.error(error.message || "Failed to delete project", { id: toastId });
+      toast.error(error.message || "Failed to delete project");
+    } finally {
+      setLoading(false);
     }
   };
 
   if (loading) {
     return (
-      <div className="flex h-screen items-center justify-center bg-[#090D16] text-[#E5383B] font-['Fira_Code']">
-        Loading Projects...
+      <div 
+        className="flex h-screen items-center justify-center bg-gray-50"
+        style={{ fontFamily: "'Fira Code', monospace" }}
+      >
+        <div className="flex flex-col items-center gap-4 text-gray-500">
+          <Activity className="h-8 w-8 animate-pulse text-red-500" />
+          <p className="text-sm font-medium animate-pulse">Loading Projects...</p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div 
-      className="min-h-screen bg-[#090D16] p-8 text-slate-100"
+    <div
+      className="min-h-screen bg-gray-50/50 p-6 md:p-10"
       style={{ fontFamily: "'Fira Code', monospace" }}
     >
-      {/* HEADER */}
-      <div className="mb-8 flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight text-white">Projects</h1>
-          <p className="mt-1 text-xs text-slate-400">Manage and monitor all active workspaces</p>
+      <div className="mx-auto max-w-7xl">
+        {/* HEADER */}
+        <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h1 className="text-2xl font-bold tracking-tight text-gray-900 sm:text-3xl">
+              Projects
+            </h1>
+            <p className="mt-1 text-sm text-gray-500">
+              Manage and monitor all active workspaces
+            </p>
+          </div>
+
+          {isCompanyAdmin && (
+            <button
+              onClick={() => setIsModalOpen(true)}
+              className="group flex w-fit items-center gap-2 rounded-lg bg-gradient-to-r from-red-600 to-orange-500 px-5 py-2.5 text-sm font-semibold text-white shadow-sm shadow-red-200 transition-all hover:opacity-90 active:scale-95"
+            >
+              <Plus size={18} className="transition-transform group-hover:rotate-90" />
+              New Project
+            </button>
+          )}
         </div>
-        
-        {isCompanyAdmin && (
-          <button 
-            onClick={() => {
-              if (!hasCompany) {
-                toast.error("You must create or join a company first!");
-                return;
-              }
-              setIsModalOpen(true);
-            }}
-            className="flex items-center gap-2 rounded-xl bg-[#CD1C18] px-5 py-2.5 text-xs font-semibold text-white transition-all hover:bg-[#b01714] shadow-lg shadow-red-950/40"
-          >
-            + New Project
-          </button>
+
+        {/* PROJECT GRID */}
+        {projects.length === 0 ? (
+          <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-gray-300 bg-white p-12 text-center shadow-sm">
+            <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-red-50 text-red-500">
+              <Folder size={32} />
+            </div>
+            <h3 className="text-lg font-semibold text-gray-900">No projects yet</h3>
+            <p className="mt-1 text-sm text-gray-500 max-w-sm">
+              Get started by creating a new project to start tracking bugs and collaborating with your team.
+            </p>
+            {isCompanyAdmin && (
+              <button
+                onClick={() => setIsModalOpen(true)}
+                className="mt-6 font-medium text-red-600 hover:text-red-700 hover:underline"
+              >
+                Create your first project →
+              </button>
+            )}
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {projects.map((project) => (
+              <div
+                key={project._id}
+                className="group flex flex-col justify-between rounded-xl border border-gray-200 bg-white p-6 shadow-sm transition-all hover:border-red-300 hover:shadow-md"
+              >
+                <div>
+                  <div className="flex items-start justify-between gap-4">
+                    <h2 className="text-lg font-bold text-gray-900 transition-colors group-hover:text-red-600 line-clamp-1">
+                      {project.name}
+                    </h2>
+                    <span className="shrink-0 rounded-md border border-red-100 bg-red-50 px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-red-700">
+                      Active
+                    </span>
+                  </div>
+                  <p className="mt-3 text-sm leading-relaxed text-gray-500 line-clamp-3">
+                    {project.description ||
+                      "No description provided for this project."}
+                  </p>
+                </div>
+
+                <div className="mt-6 flex items-center justify-end gap-3 border-t border-gray-100 pt-4">
+                  <button className="flex items-center gap-1.5 rounded-lg border border-gray-200 bg-gray-50 px-3 py-1.5 text-xs font-semibold text-gray-700 transition-colors hover:border-red-200 hover:bg-red-50 hover:text-red-700">
+                    <Bug size={14} />
+                    View Bugs
+                  </button>
+
+                  {isCompanyAdmin && (
+                    <button
+                      onClick={() => handleDelete(project._id)}
+                      title="Delete Project"
+                      className="flex items-center justify-center rounded-lg border border-red-100 bg-white px-2 py-1.5 text-red-500 transition-colors hover:bg-red-50 hover:text-red-700"
+                    >
+                      <Trash2 size={16} />
+                    </button>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* MODAL (FIXED BACKDROP) */}
+        {isModalOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/40 p-4 backdrop-blur-sm transition-opacity">
+            <div className="w-full max-w-md animate-in fade-in zoom-in-95 duration-200 rounded-2xl border border-gray-100 bg-white p-6 shadow-2xl space-y-5">
+              
+              <div className="flex items-center justify-between border-b border-gray-100 pb-4">
+                <h2 className="flex items-center gap-2 text-lg font-bold text-gray-900">
+                  <span className="flex h-6 w-6 items-center justify-center rounded-md bg-gradient-to-br from-red-600 to-orange-500 text-white shadow-sm shadow-red-200">
+                    <Plus size={14} />
+                  </span>
+                  Create New Project
+                </h2>
+                <button
+                  onClick={() => setIsModalOpen(false)}
+                  className="rounded-full p-1 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-700 focus:outline-none"
+                >
+                  <X size={20} />
+                </button>
+              </div>
+
+              <form onSubmit={handleCreateSubmit} className="space-y-4">
+                <div>
+                  <label className="mb-1.5 block text-sm font-medium text-gray-700">
+                    Project Name
+                  </label>
+                  <input
+                    type="text"
+                    value={newProject.name}
+                    onChange={(e) =>
+                      setNewProject({ ...newProject, name: e.target.value })
+                    }
+                    placeholder="e.g., ResolverHub Frontend"
+                    className="w-full rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-900 placeholder-gray-400 transition-all focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="mb-1.5 block text-sm font-medium text-gray-700">
+                    Description
+                  </label>
+                  <textarea
+                    value={newProject.description}
+                    onChange={(e) =>
+                      setNewProject({
+                        ...newProject,
+                        description: e.target.value,
+                      })
+                    }
+                    placeholder="What is this project about?"
+                    rows={3}
+                    className="w-full resize-none rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-900 placeholder-gray-400 transition-all focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500"
+                  />
+                </div>
+
+                {/* Assign Project Admin Dropdown */}
+                <div>
+                  <label className="mb-1.5 block text-sm font-medium text-gray-700">
+                    Assign Project Admin
+                  </label>
+                  <select
+                    value={newProject.projectAdminId}
+                    onChange={(e) =>
+                      setNewProject({
+                        ...newProject,
+                        projectAdminId: e.target.value,
+                      })
+                    }
+                    className="w-full appearance-none rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-900 transition-all focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500"
+                  >
+                    <option value="" disabled className="text-gray-400">
+                      Select an unassigned member...
+                    </option>
+                    {unassignedUsers.map((u) => (
+                      <option key={u._id} value={u._id}>
+                        {u.name} ({u.email})
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="flex justify-end gap-3 pt-4 border-t border-gray-100 mt-6">
+                  <button
+                    type="button"
+                    onClick={() => setIsModalOpen(false)}
+                    className="rounded-lg px-4 py-2 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-100"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="rounded-lg bg-gradient-to-r from-red-600 to-orange-500 px-5 py-2 text-sm font-semibold text-white shadow-sm shadow-red-200 transition-all hover:opacity-90 active:scale-95"
+                  >
+                    Create Project
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
         )}
       </div>
-
-      {/* PROJECT GRID */}
-      {projects.length === 0 ? (
-        <div className="rounded-xl border border-slate-800 bg-slate-900/40 p-8 text-center text-xs text-slate-500">
-          No active projects found.
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {projects.map((project) => (
-            <div 
-              key={project._id} 
-              className="group flex flex-col justify-between rounded-xl border border-slate-800 bg-slate-900/50 p-6 backdrop-blur-xl transition-all hover:border-slate-700 hover:shadow-xl"
-            >
-              <div>
-                <div className="flex items-center justify-between">
-                  <h2 className="text-lg font-bold text-white group-hover:text-[#E5383B] transition-colors">
-                    {project.name}
-                  </h2>
-                  <span className="rounded bg-slate-800 px-2 py-0.5 text-[10px] text-slate-400 border border-slate-700">
-                    Active
-                  </span>
-                </div>
-                <p className="mt-3 text-xs leading-relaxed text-slate-400 line-clamp-3">
-                  {project.description || "No description provided for this project."}
-                </p>
-              </div>
-
-              <div className="mt-6 flex items-center justify-end gap-3 border-t border-slate-800/80 pt-4">
-                <button className="rounded-lg border border-slate-700 bg-slate-800/60 px-3 py-1.5 text-xs text-slate-300 hover:bg-slate-700 hover:text-white transition-colors">
-                  View Bugs
-                </button>
-                
-                {isCompanyAdmin && (
-                  <button 
-                    onClick={() => handleDelete(project._id)} 
-                    className="rounded-lg bg-red-950/60 border border-red-800/50 px-3 py-1.5 text-xs font-semibold text-red-400 hover:bg-red-900/80 transition-colors"
-                  >
-                    Delete
-                  </button>
-                )}
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
-
-      {/* MODAL (FIXED BACKDROP) */}
-      {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 backdrop-blur-sm p-4">
-          <div className="w-full max-w-md rounded-2xl border border-slate-800 bg-[#090D16] p-6 shadow-2xl space-y-5">
-            <div className="flex items-center justify-between border-b border-slate-800 pb-3">
-              <h2 className="text-lg font-bold text-white flex items-center gap-2">
-                <span className="h-2 w-2 rounded-full bg-[#CD1C18]"></span>
-                Create New Project
-              </h2>
-              <button 
-                onClick={() => setIsModalOpen(false)}
-                className="text-slate-400 hover:text-white"
-              >
-                ✕
-              </button>
-            </div>
-            
-            <form onSubmit={handleCreateSubmit} className="space-y-4">
-              <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1">Project Name</label>
-                <input 
-                  type="text" 
-                  value={newProject.name}
-                  onChange={(e) => setNewProject({ ...newProject, name: e.target.value })}
-                  placeholder="e.g., ResolverHub Frontend" 
-                  className="w-full rounded-xl border border-slate-800 bg-slate-900/90 px-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:border-[#CD1C18] focus:outline-none focus:ring-1 focus:ring-[#CD1C18]"
-                  required
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1">Description</label>
-                <textarea 
-                  value={newProject.description}
-                  onChange={(e) => setNewProject({ ...newProject, description: e.target.value })}
-                  placeholder="What is this project about?" 
-                  rows={3}
-                  className="w-full rounded-xl border border-slate-800 bg-slate-900/90 px-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:border-[#CD1C18] focus:outline-none focus:ring-1 focus:ring-[#CD1C18]"
-                />
-              </div>
-
-              {/* Assign Project Admin Dropdown */}
-              <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1">
-                  Assign Project Admin <span className="text-slate-500 font-normal">(Optional)</span>
-                </label>
-                <select
-                  value={newProject.projectAdminId}
-                  onChange={(e) => setNewProject({ ...newProject, projectAdminId: e.target.value })}
-                  className="w-full rounded-xl border border-slate-800 bg-slate-900/90 px-3.5 py-2.5 text-xs text-white focus:border-[#CD1C18] focus:outline-none focus:ring-1 focus:ring-[#CD1C18]"
-                >
-                  <option value="">Select an unassigned member...</option>
-                  {unassignedUsers.map((u) => (
-                    <option key={u._id} value={u._id}>
-                      {u.name} ({u.email})
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div className="flex justify-end gap-3 pt-3 border-t border-slate-800">
-                <button 
-                  type="button"
-                  onClick={() => setIsModalOpen(false)}
-                  className="rounded-lg border border-slate-800 bg-slate-900 px-4 py-2 text-xs text-slate-400 hover:text-white"
-                >
-                  Cancel
-                </button>
-                <button 
-                  type="submit" 
-                  className="rounded-lg bg-[#CD1C18] px-4 py-2 text-xs font-semibold text-white hover:bg-[#b01714] shadow-md shadow-red-950/40"
-                >
-                  Create Project
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
     </div>
   );
 };

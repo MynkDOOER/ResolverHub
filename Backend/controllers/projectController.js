@@ -8,12 +8,11 @@ import {
 
 export const createProjectController = async (req, res) => {
     try {
-        const project = await createProject(req.body, req.id);
-
+        const data = await createProject(req.body, req.id);
         res.status(201).json({
             success: true,
             message: "Project Created Successfully",
-            data: project,
+            data:data,
         });
     } catch (err) {
         res.status(400).json({
@@ -46,14 +45,14 @@ export const updateProjectController = async (req, res) => {
 
 export const deleteProjectController = async (req, res) => {
     try {
-        const result = await deleteProject(
+        await deleteProject(
             req.params.id,
             req.id 
         );
 
         res.status(200).json({
             success: true,
-            message: result.message,
+            message: "Project Deleted Successfully",
         });
     } catch (err) {
         res.status(400).json({

@@ -10,6 +10,7 @@ import {
 import {
   findUserById,
   findUserByIdAndUpdate,
+  findUsers,
   updateManyUsers,
 } from "../repositories/userRepository.js";
 import crypto from "crypto";
@@ -59,6 +60,28 @@ export const registerCompany = async (companyData, userId) => {
   } finally {
     session.endSession();
   }
+};
+
+export const getAvailableProjectAdmins = async (userId) => {
+	const user = await findUserById(userId);
+	if (!user) {
+		throw new Error("User not found");
+	}
+	if (!user.companyId) {
+		throw new Error("User is not in a company");
+	}
+	const company = await findCompanyById(user.companyId);
+
+	if (!company) {
+		throw new Error("Company not found");
+	}
+	if (company.adminId.toString() !== userId.toString()) {
+		throw new Error("Only Company Admin can view available members");
+	}
+	return await findUsers({
+		companyId: user.companyId,
+		projectId: null,
+	});
 };
 
 export const updateCompany = async (companyId, companyData, userId) => {
@@ -121,8 +144,10 @@ export const updateCompany = async (companyId, companyData, userId) => {
         adminId: updatedCompany.adminId,
       };
     } catch (err) {
-      throw new Error(err.message);
-    } finally {
+    throw new Error(err.message, {
+      cause: err,
+    });
+  } finally {
       session.endSession();
     }
   } else {
@@ -171,8 +196,10 @@ export const deleteCompany = async (companyId, userId) => {
     return {
       message: "Company and related user references deleted successfully",
     };
-  } catch (error) {
-    throw new Error(error.message);
+  } catch (err) {
+    throw new Error(err.message, {
+      cause: err,
+    });
   } finally {
     session.endSession();
   }

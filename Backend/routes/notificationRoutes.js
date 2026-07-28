@@ -3,6 +3,7 @@ import protect from "../middlewares/authMiddleware.js";
 import {
 	acceptRequest,
 	denyRequest,
+	getCompanyRequests,
 	getNotifications,
 	joinCompany,
 	joinProject,
@@ -17,5 +18,6 @@ routes.get("/", protect, getNotifications);
 routes.patch("/:id/read", protect, markNotificationAsRead);
 routes.patch("/:id/accept", protect, acceptRequest);
 routes.patch("/:id/deny", protect, denyRequest);
+routes.get("/company-requests", protect, getCompanyRequests);
 
 export default routes;
