@@ -193,11 +193,12 @@ const Navbar = () => {
                     to="/profile"
                     className="flex h-8 w-8 items-center justify-center overflow-hidden rounded-full border border-gray-200 transition-all hover:border-red-400 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
                   >
-                    <img
+                    {/* <img
                       src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp"
                       alt="Profile"
                       className="h-full w-full object-cover"
-                    />
+                    /> */}
+                    {user.name[0].toUpperCase()}
                   </Link>
                   <button
                     onClick={handleLogout}

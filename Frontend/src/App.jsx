@@ -74,6 +74,14 @@ const App = () => {
               </AuthProtectedRoute>
             }
           />
+          <Route
+            path="/profile"
+            element={
+              <AuthProtectedRoute>
+                <Profile />
+              </AuthProtectedRoute>
+            }
+          />
         </Route>
       </Routes>
 
