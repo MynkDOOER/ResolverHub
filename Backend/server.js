@@ -1,5 +1,6 @@
+import dns from 'dns';
+dns.setServers(['8.8.8.8', '8.8.4.4']);
 import cors from "cors";
-import dns from "dns";
 import dotenv from "dotenv";
 import express from "express";
 import mongoose from "mongoose";
@@ -12,7 +13,7 @@ import notificationRoutes from "./routes/notificationRoutes.js";
 import bugRoutes from "./routes/bugRoutes.js";
 import commentRoutes from "./routes/commentRoutes.js";
 
-dns.setServers(["8.8.8.8", "8.8.4.4"]);
+
 
 dotenv.config({
 	path: "../.env",
@@ -26,6 +27,8 @@ app.use(express.json());
 
 const connectDB = async () => {
 	try {
+		console.log(process.env.MONGODB_URI);
+		
 		await mongoose.connect(process.env.MONGODB_URI);
 		console.log("MONGODB CONNECTED✅");
 	} catch (err) {

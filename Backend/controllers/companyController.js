@@ -1,5 +1,6 @@
 import {
 	deleteCompany,
+	getAvailableProjectAdmins,
 	registerCompany,
 	updateCompany,
 } from "../services/companyService.js";
@@ -53,3 +54,18 @@ export const remove = async (req, res) => {
 		});
 	}
 };
+
+export const getProjectAdmins = async(req, res) => {
+	try{
+		const availableUsers = await getAvailableProjectAdmins(req.id)
+		res.status(200).json({
+			success:true,
+			data:availableUsers
+		})
+	} catch(error){
+		res.status(400).json({
+			success:false,
+			message:error.message
+		})
+	}
+}

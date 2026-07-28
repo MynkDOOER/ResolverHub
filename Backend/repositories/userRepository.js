@@ -31,8 +31,9 @@ export const findUserByRole = async (role) => {
 	return await User.find({ role }).select("-password");
 };
 
-export const findUsersByCompanyId = async (companyId) => {
-	return await User.find({ companyId });
+
+export const findUsers = async (filter) => {
+    return User.find(filter);
 };
 
 export const updateUserCompany = async (userId, companyId) => {
