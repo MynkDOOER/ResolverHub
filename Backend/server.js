@@ -33,7 +33,7 @@ const connectDB = async () => {
 	}
 };
 
-connectDB();
+await connectDB();
 
 app.use("/api/auth", authRoutes);
 app.use("/api/profile", profileRoutes);
@@ -41,7 +41,7 @@ app.use("/api/company", companyRoutes);
 app.use("/api/projects", projectRoutes);
 app.use("/api/notifications", notificationRoutes);
 app.use("/api/bugs", bugRoutes);
-app.use("/api/comments", commentRoutes)
+app.use("/api/comments", commentRoutes);
 
 const PORT = process.env.PORT;
 

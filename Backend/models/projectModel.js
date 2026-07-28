@@ -8,7 +8,7 @@ const projectSchema = new mongoose.Schema(
 		},
 		companyId: {
 			type: mongoose.Schema.Types.ObjectId,
-			default: null,
+			required: true,
 			ref: "companies",
 		},
 		description: {
@@ -17,6 +17,7 @@ const projectSchema = new mongoose.Schema(
 		},
 		adminId: {
 			type: mongoose.Schema.Types.ObjectId,
+			required: true,
 			ref: "user",
 		},
 	},

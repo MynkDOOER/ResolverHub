@@ -4,7 +4,7 @@ const protect = async (req, res, next) => {
 	const authHeader = req.headers.authorization;
 
 	if (!authHeader || !authHeader.startsWith("Bearer ")) {
-		return res.status(400).json({
+		return res.status(401).json({
 			success: false,
 			message: "token not found",
 		});
@@ -17,7 +17,7 @@ const protect = async (req, res, next) => {
 		req.id = decoded.userId;
 		next();
 	} catch (err) {
-		return res.status(400).json({
+		return res.status(401).json({
 			success: false,
 			message: "Invalid token or token expired",
 		});
