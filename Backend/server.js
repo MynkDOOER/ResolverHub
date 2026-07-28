@@ -10,6 +10,7 @@ import companyRoutes from "./routes/companyRoutes.js";
 import projectRoutes from "./routes/projectRoutes.js";
 import notificationRoutes from "./routes/notificationRoutes.js";
 import bugRoutes from "./routes/bugRoutes.js";
+import commentRoutes from "./routes/commentRoutes.js";
 
 dns.setServers(["8.8.8.8", "8.8.4.4"]);
 
@@ -40,6 +41,7 @@ app.use("/api/company", companyRoutes);
 app.use("/api/projects", projectRoutes);
 app.use("/api/notifications", notificationRoutes);
 app.use("/api/bugs", bugRoutes);
+app.use("/api/comments", commentRoutes)
 
 const PORT = process.env.PORT;
 
