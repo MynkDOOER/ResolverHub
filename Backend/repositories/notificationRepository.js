@@ -52,3 +52,11 @@ export const findCompanyRequestsForAdmin = async (adminId) => {
         actionStatus: "Pending",
     }).populate("senderId", "name email");
 };
+
+export const findProjectRequestsForAdmin = async (adminId) => {
+    return await Notification.find({
+        recipientId: adminId,
+        type: "Project_Join_Request",
+        actionStatus: "Pending"
+    }).populate("senderId", "name email"); // Populating so we can display user name/email
+};

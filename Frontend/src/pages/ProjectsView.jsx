@@ -5,12 +5,24 @@ import {
   deleteProjectById,
 } from "../api/projectApi";
 import useAuthStore from "../stores/authStore";
+import { requestToJoinProject } from "../api/notificationApi";
 import { useEffect, useState } from "react";
-import { Plus, Folder, Trash2, Bug, X, Activity } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { Plus, Folder, Trash2, Bug, X, Activity, UserPlus } from "lucide-react";
+import { fetchAllBugs, createNewBug } from "../api/bugsApi"
 
 const ProjectsView = () => {
   const { user, token } = useAuthStore();
+  const navigate = useNavigate();
   const isCompanyAdmin = user?.role === "Admin";
+
+  // REDIRECT LOGIC: If a user is already assigned to a project and is NOT a Company Admin,
+  // immediately redirect them to their specific project workspace.
+  useEffect(() => {
+    if (user?.projectId && !isCompanyAdmin) {
+      navigate("/company/my-project", { replace: true });
+    }
+  }, [user, navigate, isCompanyAdmin]);
 
   const [projects, setProjects] = useState([]);
   const [companyUsers, setCompanyUsers] = useState([]);
@@ -20,7 +32,7 @@ const ProjectsView = () => {
   const [newProject, setNewProject] = useState({
     name: "",
     description: "",
-    projectAdminId: "",
+    adminId: "",
   });
 
   // Fetch Projects & Unassigned Users
@@ -62,7 +74,7 @@ const ProjectsView = () => {
     const toastid = toast.loading("Creating project...");
 
     try {
-      if (!newProject.projectAdminId) {
+      if (!newProject.adminId) {
         toast.dismiss(toastid);
         return toast.error("Please assign a Project Admin.");
       }
@@ -78,7 +90,7 @@ const ProjectsView = () => {
             user._id.toString() !== result.data.updatedUser._id.toString(),
         ),
       );
-      setNewProject({ name: "", description: "", projectAdminId: "" });
+      setNewProject({ name: "", description: "", adminId: "" });
       setIsModalOpen(false);
     } catch (error) {
       toast.dismiss(toastid);
@@ -114,15 +126,27 @@ const ProjectsView = () => {
     }
   };
 
+  const handleRequestJoin = async (projectId) => {
+    const toastId = toast.loading("Sending request...");
+    try {
+      await requestToJoinProject(projectId);
+      toast.success("Join request sent to the Project Admin!", { id: toastId });
+    } catch (error) {
+      toast.error(error.message || "Failed to send request", { id: toastId });
+    }
+  };
+
   if (loading) {
     return (
-      <div 
+      <div
         className="flex h-screen items-center justify-center bg-gray-50"
         style={{ fontFamily: "'Fira Code', monospace" }}
       >
         <div className="flex flex-col items-center gap-4 text-gray-500">
           <Activity className="h-8 w-8 animate-pulse text-red-500" />
-          <p className="text-sm font-medium animate-pulse">Loading Projects...</p>
+          <p className="text-sm font-medium animate-pulse">
+            Loading Projects...
+          </p>
         </div>
       </div>
     );
@@ -148,9 +172,12 @@ const ProjectsView = () => {
           {isCompanyAdmin && (
             <button
               onClick={() => setIsModalOpen(true)}
-              className="group flex w-fit items-center gap-2 rounded-lg bg-gradient-to-r from-red-600 to-orange-500 px-5 py-2.5 text-sm font-semibold text-white shadow-sm shadow-red-200 transition-all hover:opacity-90 active:scale-95"
+              className="group flex w-fit items-center gap-2 rounded-lg bg-linear-to-r from-red-600 to-orange-500 px-5 py-2.5 text-sm font-semibold text-white shadow-sm shadow-red-200 transition-all hover:opacity-90 active:scale-95"
             >
-              <Plus size={18} className="transition-transform group-hover:rotate-90" />
+              <Plus
+                size={18}
+                className="transition-transform group-hover:rotate-90"
+              />
               New Project
             </button>
           )}
@@ -162,9 +189,12 @@ const ProjectsView = () => {
             <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-red-50 text-red-500">
               <Folder size={32} />
             </div>
-            <h3 className="text-lg font-semibold text-gray-900">No projects yet</h3>
+            <h3 className="text-lg font-semibold text-gray-900">
+              No projects yet
+            </h3>
             <p className="mt-1 text-sm text-gray-500 max-w-sm">
-              Get started by creating a new project to start tracking bugs and collaborating with your team.
+              Get started by creating a new project to start tracking bugs and
+              collaborating with your team.
             </p>
             {isCompanyAdmin && (
               <button
@@ -198,6 +228,17 @@ const ProjectsView = () => {
                 </div>
 
                 <div className="mt-6 flex items-center justify-end gap-3 border-t border-gray-100 pt-4">
+                  {/* "Request to Join" Button (Hidden if user is already in a project or is Company Admin) */}
+                  {!user?.projectId && !isCompanyAdmin && (
+                    <button
+                      onClick={() => handleRequestJoin(project._id)}
+                      className="flex items-center gap-1.5 rounded-lg border border-orange-200 bg-orange-50 px-3 py-1.5 text-xs font-semibold text-orange-700 transition-colors hover:border-orange-300 hover:bg-orange-100"
+                    >
+                      <UserPlus size={14} />
+                      Request to Join
+                    </button>
+                  )}
+
                   <button className="flex items-center gap-1.5 rounded-lg border border-gray-200 bg-gray-50 px-3 py-1.5 text-xs font-semibold text-gray-700 transition-colors hover:border-red-200 hover:bg-red-50 hover:text-red-700">
                     <Bug size={14} />
                     View Bugs
@@ -222,7 +263,6 @@ const ProjectsView = () => {
         {isModalOpen && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/40 p-4 backdrop-blur-sm transition-opacity">
             <div className="w-full max-w-md animate-in fade-in zoom-in-95 duration-200 rounded-2xl border border-gray-100 bg-white p-6 shadow-2xl space-y-5">
-              
               <div className="flex items-center justify-between border-b border-gray-100 pb-4">
                 <h2 className="flex items-center gap-2 text-lg font-bold text-gray-900">
                   <span className="flex h-6 w-6 items-center justify-center rounded-md bg-gradient-to-br from-red-600 to-orange-500 text-white shadow-sm shadow-red-200">
@@ -279,11 +319,11 @@ const ProjectsView = () => {
                     Assign Project Admin
                   </label>
                   <select
-                    value={newProject.projectAdminId}
+                    value={newProject.adminId}
                     onChange={(e) =>
                       setNewProject({
                         ...newProject,
-                        projectAdminId: e.target.value,
+                        adminId: e.target.value,
                       })
                     }
                     className="w-full appearance-none rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-900 transition-all focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500"

@@ -5,6 +5,7 @@ import {
 	denyRequest,
 	getCompanyRequests,
 	getNotifications,
+	getProjectRequests,
 	joinCompany,
 	joinProject,
 	markNotificationAsRead,
@@ -18,6 +19,6 @@ routes.get("/", protect, getNotifications);
 routes.patch("/:id/read", protect, markNotificationAsRead);
 routes.patch("/:id/accept", protect, acceptRequest);
 routes.patch("/:id/deny", protect, denyRequest);
-routes.get("/company-requests", protect, getCompanyRequests);
-
+routes.get("/company-requests", protect, getCompanyRequests); 
+routes.get("/project-requests", protect, getProjectRequests);
 export default routes;

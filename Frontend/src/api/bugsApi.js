@@ -1,5 +1,5 @@
 import useAuthStore from "../stores/authStore";
-const API_URL = "http://localhost:5000/api/projects";
+const API_URL = "http://localhost:5000/api/bugs";
 
 const getAuthHeaders = () => {
     const token = useAuthStore.getState().token;
@@ -9,8 +9,8 @@ const getAuthHeaders = () => {
   };
 };
 
-export const fetchAllProjects = async () => {
-  const response = await fetch(`${API_URL}/all`, {
+export const fetchAllBugs = async () => {
+  const response = await fetch(`${API_URL}/`, {
     method: "GET",
     headers: getAuthHeaders(),
   });
@@ -19,18 +19,29 @@ export const fetchAllProjects = async () => {
   return data.data;
 };
 
-export const createNewProject = async (projectData) => {
-  const response = await fetch(`${API_URL}/create`, {
+
+export const fetchBug = async (id) => {
+  const response = await fetch(`${API_URL}/${id}`, {
+    method: "GET",
+    headers: getAuthHeaders(),
+  });
+  const data = await response.json();
+  if (!data.success) throw new Error(data.message);
+  return data.data;
+};
+
+export const createNewBug = async (BugData) => {
+  const response = await fetch(`${API_URL}/`, {
     method: "POST",
     headers: getAuthHeaders(),
-    body: JSON.stringify(projectData),
+    body: JSON.stringify(BugData),
   });
   const data = await response.json();
   if (!data.success) throw new Error(data.message);
   return data;
 };
 
-export const deleteProjectById = async (id) => {
+export const deleteBugById = async (id) => {
   const response = await fetch(`${API_URL}/${id}`, {
     method: "DELETE",
     headers: getAuthHeaders(),
@@ -40,12 +51,13 @@ export const deleteProjectById = async (id) => {
   return data;
 };
 
-export const fetchProjectUnassignedMembers = async () => {
-  const response = await fetch(`${API_URL}/free-members`, {
-    method: "GET",
+export const updateBugById = async (id) => {
+  const response = await fetch(`${API_URL}/${id}`, {
+    method: "PATCH",
     headers: getAuthHeaders(),
   });
   const data = await response.json();
   if (!data.success) throw new Error(data.message);
-  return data.data;
+  return data;
 };
+

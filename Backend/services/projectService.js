@@ -11,6 +11,7 @@ import {
 import {
 	findUserById,
 	findUserByIdAndUpdate,
+	findUsers,
 	updateManyUsers,
 } from "../repositories/userRepository.js";
 
@@ -34,11 +35,11 @@ export const createProject = async (projectData, userId) => {
 	if (existing) {
 		throw new Error("Project already exists");
 	}
-	if (!projectData.projectAdminId) {
+	if (!projectData.adminId) {
 		throw new Error("Please select a Project Admin");
 	}
 
-	const projectAdmin = await findUserById(projectData.projectAdminId);
+	const projectAdmin = await findUserById(projectData.adminId);
 
 	if (!projectAdmin) {
 		throw new Error("Project Admin not found");
@@ -70,11 +71,10 @@ export const createProject = async (projectData, userId) => {
 			console.log(projectCreated);
 
 			updatedUser = await findUserByIdAndUpdate(
-				projectData.projectAdminId,
+				projectData.adminId,
 				{
 					projectId: projectCreated._id,
 					role: "ProjectAdmin",
-					adminId: projectData.projectAdminId,
 				},
 				{ session },
 			);
@@ -181,3 +181,27 @@ export const getAllProjects = async (userId) => {
 
 	return await findProjectByCompanyId(user.companyId);
 };
+
+export const getAvailableProjectMembers = async(userId) => {
+	const user = await findUserById(userId);
+	if(!user){
+		throw new Error('user not found');
+	}
+	if(!user.companyId){
+		throw new Error('User in not in company');
+	}
+	if(!user.projectId){
+		throw new Error('User is not in the Project');
+	}
+	const project = await findProjectById(user.projectId);
+	if(!project){
+		throw new Error("Project not found");
+	}
+	if(project.adminId.toString() !== userId.toString()) {
+		throw new Error("Only Projecr Admi can view available members")
+	}
+	return await findUsers({
+		projectId: user.projectId,
+		role:'Unassigned'
+	})
+}
