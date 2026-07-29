@@ -12,6 +12,11 @@ import CompanyProtectedRoute from "./components/companyProtection/ProtectedRoute
 import CompanyPublicRoute from "./components/companyProtection/PublicRoute";
 import CompanySetup from "./pages/CompanySetup";
 import CompanyRequests from "./pages/companyRequests";
+import ProjectBugView from "./pages/projectBugView";
+import ProjectProtectedRoute from "./components/projectProtection/ProtectedRoute";
+
+// 👇 IMPORTANT: Import the new ProjectRequests page we created!
+import ProjectRequests from "./pages/ProjectRequests"; 
 
 const App = () => {
   return (
@@ -74,11 +79,28 @@ const App = () => {
               </AuthProtectedRoute>
             }
           />
+          
+          {/* 👇 NEW ROUTE: Added the route for Project Requests */}
           <Route
-            path="/profile"
+            path="/company/project-requests"
             element={
               <AuthProtectedRoute>
-                <Profile />
+                <CompanyProtectedRoute>
+                  <ProjectRequests />
+                </CompanyProtectedRoute>
+              </AuthProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/company/my-project"
+            element={
+              <AuthProtectedRoute>
+                <CompanyProtectedRoute>
+                  <ProjectProtectedRoute>
+                    <ProjectBugView />
+                  </ProjectProtectedRoute>
+                </CompanyProtectedRoute>
               </AuthProtectedRoute>
             }
           />

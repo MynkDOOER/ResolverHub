@@ -1,7 +1,15 @@
 import { Link, useNavigate } from "react-router-dom";
 import useAuthStore from "../stores/authStore";
 import { useEffect, useState, useRef } from "react";
-import { Bell, Menu, X, LogOut, ChevronRight, Briefcase, Zap } from "lucide-react";
+import {
+  Bell,
+  Menu,
+  X,
+  LogOut,
+  ChevronRight,
+  Briefcase,
+  Zap,
+} from "lucide-react";
 
 const Navbar = () => {
   const user = useAuthStore((state) => state.user);
@@ -11,7 +19,7 @@ const Navbar = () => {
   const [notifications, setNotifications] = useState([]);
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  
+
   const notificationRef = useRef(null);
   const navigate = useNavigate();
 
@@ -23,7 +31,10 @@ const Navbar = () => {
   // Close dropdowns when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (notificationRef.current && !notificationRef.current.contains(event.target)) {
+      if (
+        notificationRef.current &&
+        !notificationRef.current.contains(event.target)
+      ) {
         setIsNotificationOpen(false);
       }
     };
@@ -40,7 +51,7 @@ const Navbar = () => {
             headers: {
               Authorization: `Bearer ${token}`,
             },
-          }
+          },
         );
 
         const data = await response.json();
@@ -50,7 +61,7 @@ const Navbar = () => {
         }
 
         setNotifications(
-          Array.isArray(data.notifications) ? data.notifications : []
+          Array.isArray(data.notifications) ? data.notifications : [],
         );
       } catch (err) {
         console.error("Failed to fetch notifications:", err.message);
@@ -65,24 +76,38 @@ const Navbar = () => {
   }, [token]);
 
   const unreadNotificationCount = notifications.filter(
-    (notification) => !notification.isRead
+    (notification) => !notification.isRead,
   ).length;
+  
+  const isCompanyAdmin = user?.role === "Admin";
+  const isProjectAdmin = user?.role === "ProjectAdmin";
+  
+  const activeRequestCount = notifications.filter((notification) => {
+    if (isCompanyAdmin) {
+      return (
+        notification.type === "Company_Join_Request" &&
+        notification.actionStatus === "Pending"
+      );
+    }
+    if (isProjectAdmin) {
+      return (
+        notification.type === "Project_Join_Request" &&
+        notification.actionStatus === "Pending"
+      );
+    }
+    return false;
+  }).length;
 
-  const companyRequestCount = notifications.filter(
-    (notification) =>
-      notification.type === "Company_Join_Request" &&
-      notification.actionStatus === "Pending"
-  ).length;
+  const requestLink = isCompanyAdmin ? "/company/requests" : "/company/project-requests";
+  const requestText = isCompanyAdmin ? "company" : "project";
 
   return (
-    <nav 
+    <nav
       className="sticky top-0 z-50 w-full border-b border-gray-200 bg-white shadow-sm"
       style={{ fontFamily: "'Fira Code', monospace" }}
     >
-      {/* Removed max-w-7xl to let the navbar stretch edge-to-edge */}
       <div className="px-4 sm:px-8 lg:px-12 w-full">
         <div className="flex h-16 items-center justify-between">
-          
           {/* LEFT: LOGO */}
           <div className="flex items-center">
             <Link
@@ -111,10 +136,18 @@ const Navbar = () => {
                   </Link>
                 ) : (
                   <Link
-                    to="/company/projects"
+                    // SMART ROUTE: Redirect assigned users directly to their project
+                    to={
+                      user.projectId && user.role !== "Admin"
+                        ? "/company/my-project"
+                        : "/company/projects"
+                    }
                     className="group flex items-center gap-2 rounded-md bg-gray-50 px-3 py-1.5 text-sm font-semibold text-gray-700 ring-1 ring-inset ring-gray-200 transition-all hover:bg-red-50 hover:text-red-700 hover:ring-red-200"
                   >
-                    <Briefcase size={16} className="text-gray-500 transition-colors group-hover:text-red-600" />
+                    <Briefcase
+                      size={16}
+                      className="text-gray-500 transition-colors group-hover:text-red-600"
+                    />
                     Projects
                   </Link>
                 )}
@@ -123,19 +156,27 @@ const Navbar = () => {
                 <div className="h-6 w-px bg-gray-200"></div>
 
                 {/* NOTIFICATION BELL */}
-                <div className="relative flex items-center" ref={notificationRef}>
+                <div
+                  className="relative flex items-center"
+                  ref={notificationRef}
+                >
                   <button
                     onClick={() => {
                       setIsNotificationOpen((prev) => !prev);
                       setNotifications((prev) =>
-                        prev.map((notif) => ({ ...notif, isRead: true }))
+                        prev.map((notif) => ({ ...notif, isRead: true })),
                       );
                     }}
                     className="relative rounded-full p-1.5 text-gray-500 transition-all hover:bg-red-50 hover:text-red-600 focus:outline-none"
                     aria-label="Notifications"
                   >
-                    <Bell size={20} className={isNotificationOpen ? "fill-red-100 text-red-600" : ""} />
-                    
+                    <Bell
+                      size={20}
+                      className={
+                        isNotificationOpen ? "fill-red-100 text-red-600" : ""
+                      }
+                    />
+
                     {unreadNotificationCount > 0 && (
                       <span className="absolute right-1 top-1 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-red-600 text-[9px] font-bold text-white ring-2 ring-white">
                         {unreadNotificationCount}
@@ -147,7 +188,9 @@ const Navbar = () => {
                   {isNotificationOpen && (
                     <div className="absolute right-0 top-10 mt-2 w-80 origin-top-right overflow-hidden rounded-xl border border-gray-100 bg-white shadow-xl shadow-red-900/5 transition-all">
                       <div className="flex items-center justify-between border-b border-gray-50 bg-gray-50/50 px-4 py-3">
-                        <h3 className="text-sm font-semibold text-gray-900">Notifications</h3>
+                        <h3 className="text-sm font-semibold text-gray-900">
+                          Notifications
+                        </h3>
                         {unreadNotificationCount > 0 && (
                           <span className="rounded-full bg-red-100 px-2 py-0.5 text-xs font-medium text-red-700">
                             {unreadNotificationCount} new
@@ -156,9 +199,10 @@ const Navbar = () => {
                       </div>
 
                       <div className="max-h-80 overflow-y-auto p-2">
-                        {companyRequestCount > 0 ? (
+                        {/* DYNAMIC REQUEST LINK */}
+                        {activeRequestCount > 0 ? (
                           <Link
-                            to="/company/requests"
+                            to={requestLink}
                             onClick={() => setIsNotificationOpen(false)}
                             className="group flex items-start gap-4 rounded-lg p-3 transition-all hover:bg-red-50"
                           >
@@ -167,19 +211,29 @@ const Navbar = () => {
                             </div>
                             <div className="flex-1">
                               <p className="text-sm font-medium text-gray-900 group-hover:text-red-700">
-                                {companyRequestCount} pending company {companyRequestCount === 1 ? "request" : "requests"}
+                                {activeRequestCount} pending {requestText}{" "}
+                                {activeRequestCount === 1 ? "request" : "requests"}
                               </p>
-                              <p className="mt-0.5 text-xs text-gray-500">Click to review and approve</p>
+                              <p className="mt-0.5 text-xs text-gray-500">
+                                Click to review and approve
+                              </p>
                             </div>
-                            <ChevronRight size={16} className="mt-2 text-gray-400 group-hover:text-red-600" />
+                            <ChevronRight
+                              size={16}
+                              className="mt-2 text-gray-400 group-hover:text-red-600"
+                            />
                           </Link>
                         ) : (
                           <div className="flex flex-col items-center justify-center py-8 text-center">
                             <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-gray-50 text-gray-400">
                               <Bell size={24} />
                             </div>
-                            <p className="text-sm font-medium text-gray-900">All caught up!</p>
-                            <p className="text-xs text-gray-500">No new notifications right now.</p>
+                            <p className="text-sm font-medium text-gray-900">
+                              All caught up!
+                            </p>
+                            <p className="text-xs text-gray-500">
+                              No new notifications right now.
+                            </p>
                           </div>
                         )}
                       </div>
@@ -193,11 +247,6 @@ const Navbar = () => {
                     to="/profile"
                     className="flex h-8 w-8 items-center justify-center overflow-hidden rounded-full border border-gray-200 transition-all hover:border-red-400 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
                   >
-                    {/* <img
-                      src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp"
-                      alt="Profile"
-                      className="h-full w-full object-cover"
-                    /> */}
                     {user.name[0].toUpperCase()}
                   </Link>
                   <button
@@ -243,7 +292,7 @@ const Navbar = () => {
                 )}
               </button>
             )}
-            
+
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
               className="rounded-lg p-2 text-gray-600 transition-colors hover:bg-gray-100 focus:outline-none"
@@ -261,14 +310,19 @@ const Navbar = () => {
             {user ? (
               <>
                 <div className="mb-4 flex items-center gap-3 border-b border-gray-100 pb-4">
-                  <img
-                    src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp"
-                    alt="Profile"
-                    className="h-10 w-10 rounded-full"
-                  />
+                  <div className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-full border border-gray-200">
+                    {user.name[0].toUpperCase()}
+                  </div>
                   <div>
-                    <p className="text-sm font-medium text-gray-900">My Account</p>
-                    <Link to="/profile" className="text-xs text-red-600 hover:underline">View Profile</Link>
+                    <p className="text-sm font-medium text-gray-900">
+                      My Account
+                    </p>
+                    <Link
+                      to="/profile"
+                      className="text-xs text-red-600 hover:underline"
+                    >
+                      View Profile
+                    </Link>
                   </div>
                 </div>
 
@@ -305,7 +359,7 @@ const Navbar = () => {
                 </Link>
                 <Link
                   to="/signup"
-                  className="rounded-lg bg-gradient-to-r from-red-600 to-orange-500 px-3 py-2.5 text-center text-base font-medium text-white shadow-sm hover:opacity-90"
+                  className="rounded-lg bg-linear-to-r from-red-600 to-orange-500 px-3 py-2.5 text-center text-base font-medium text-white shadow-sm hover:opacity-90"
                 >
                   Sign up
                 </Link>

@@ -1,11 +1,13 @@
 import express from 'express'
 import protect from '../middlewares/authMiddleware.js'
-import { createProjectController, deleteProjectController, getAllProjectsController, getProjectController, updateProjectController }
+import { createProjectController, deleteProjectController, getAllProjectsController, getProjectController, getProjectUnassignedMembersController, updateProjectController }
  from '../controllers/projectController.js';
 
 const routes = express.Router();
 
 routes.post("/create", protect, createProjectController);
+
+routes.get("/free-members", protect, getProjectUnassignedMembersController)
 
 routes.get("/all", protect, getAllProjectsController);
 

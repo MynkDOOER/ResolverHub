@@ -24,20 +24,21 @@ export const fetchCompanyRequests = async () => {
 	return data.data;
 };
 
-export const acceptRequest = async (notificationId) => {
-	const response = await fetch(
-		`${API_URL}/${notificationId}/accept`,
-		{
-			method: "PATCH",
-			headers: getAuthHeaders(),
-		},
-	);
+export const acceptRequest = async (notificationId, role = null) => {
+  // If a role is provided, send it. If not, send an empty JSON object.
+  const bodyPayload = role ? { role } : {};
 
-	const data = await response.json();
+  const response = await fetch(`${API_URL}/${notificationId}/accept`, {
+    method: "PATCH",
+    headers: getAuthHeaders(),
+    body: JSON.stringify(bodyPayload),
+  });
 
-	if (!data.success) throw new Error(data.message);
+  const data = await response.json();
 
-	return data;
+  if (!data.success) throw new Error(data.message);
+
+  return data;
 };
 
 export const denyRequest = async (notificationId) => {
@@ -54,4 +55,28 @@ export const denyRequest = async (notificationId) => {
 	if (!data.success) throw new Error(data.message);
 
 	return data;
+};
+
+export const requestToJoinProject = async (projectId) => {
+  const response = await fetch(`${API_URL}/project/join`, {
+    method: "POST",
+    headers: getAuthHeaders(),
+    body: JSON.stringify({ projectId }),
+  });
+
+  const data = await response.json();
+
+  if (!data.success) throw new Error(data.message);
+
+  return data;
+};
+
+export const fetchProjectRequests = async () => {
+	const response = await fetch(`${API_URL}/project-requests`, {
+		method: "GET",
+		headers: getAuthHeaders(),
+	});
+	const data = await response.json();
+	if (!data.success) throw new Error(data.message);
+	return data.data;
 };

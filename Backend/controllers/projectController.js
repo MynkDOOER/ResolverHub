@@ -4,6 +4,7 @@ import {
     deleteProject,
     getAllProjects,
     getProject,
+    getAvailableProjectMembers,
 } from "../services/projectService.js";
 
 export const createProjectController = async (req, res) => {
@@ -95,3 +96,20 @@ export const getAllProjectsController = async (req, res) => {
         });
     }
 };
+
+export const getProjectUnassignedMembersController = async(req, res) => {
+    try{
+        const availableUsers = await getAvailableProjectMembers(
+            req.id
+        )
+        res.status(200).json({
+			success:true,
+			data:availableUsers
+		})
+    } catch(error){
+        res.status(400).json({
+            success:false,
+            message:error.message
+        })
+    }
+}
