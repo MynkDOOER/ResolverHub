@@ -13,6 +13,7 @@ import CompanyPublicRoute from "./components/companyProtection/PublicRoute";
 import CompanySetup from "./pages/CompanySetup";
 import CompanyRequests from "./pages/companyRequests";
 import AdminProtectedRoute from "./components/adminProtection/ProtectedRoute";
+import BugDetails from "./pages/BugDetails";
 
 const App = () => {
 	return (
@@ -84,6 +85,10 @@ const App = () => {
 								<Profile />
 							</AuthProtectedRoute>
 						}
+					/>
+					<Route
+						path="/company/my-project/bug/:bugId"
+						element={<BugDetails />}
 					/>
 				</Route>
 			</Routes>

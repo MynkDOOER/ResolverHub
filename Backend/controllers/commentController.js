@@ -2,6 +2,7 @@ import { comment, getComments } from "../services/commentService.js";
 
 export const create = async (req, res) => {
 	try {
+		console.log(req.body);
 		const createdComment = await comment(req.body, req.id);
 		res.status(201).json({
 			success: true,
